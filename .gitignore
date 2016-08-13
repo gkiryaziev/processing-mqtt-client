@@ -1,0 +1,7 @@
+.git/
+application.macosx/
+application.windows32/
+application.windows64/
+
+*.zip
+*.7z

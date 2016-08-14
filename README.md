@@ -10,3 +10,5 @@ I was interested to try to create something in a language Processing and I wrote
 [MQTT library](https://github.com/256dpi/processing-mqtt)
 
 All necessary requirements you can install using the built-in Contribution Manager.
+
+![processing-mqtt-client](/processing-mqtt-client.png?raw=true "processing-mqtt-client")

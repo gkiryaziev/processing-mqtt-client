@@ -14,6 +14,20 @@
  * =========================================================
  */
 
+public void imgTogBtnRed_Click(GImageToggleButton source, GEvent event) { //_CODE_:imgTogBtnRed:576875:
+  
+  client.publish("RPI1/SYSTEM/LED1/ACTION", str(source.getState()), 2, false);
+  delay(100);
+ 
+} //_CODE_:imgTogBtnRed:576875:
+
+public void imgTogBtnGreen_Click(GImageToggleButton source, GEvent event) { //_CODE_:imgTogBtnGreen:767188:
+
+  client.publish("RPI1/SYSTEM/LED0/ACTION", str(source.getState()), 2, false);
+  delay(100);
+
+} //_CODE_:imgTogBtnGreen:767188:
+
 
 
 // Create all the GUI controls. 
@@ -78,6 +92,10 @@ public void createGUI(){
   lblMemoryFree.setTextBold();
   lblMemoryFree.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   lblMemoryFree.setOpaque(true);
+  imgTogBtnRed = new GImageToggleButton(this, 10, 210, "led-red-50.png", "led-red-50.png", 1, 2);
+  imgTogBtnRed.addEventHandler(this, "imgTogBtnRed_Click");
+  imgTogBtnGreen = new GImageToggleButton(this, 200, 210, "led-green-50.png", 1, 2);
+  imgTogBtnGreen.addEventHandler(this, "imgTogBtnGreen_Click");
 }
 
 // Variable declarations 
@@ -92,3 +110,5 @@ GLabel lblMemoryAvailableLbl;
 GLabel lblMemoryAvailable; 
 GLabel lblMemoryFreeLbl; 
 GLabel lblMemoryFree; 
+GImageToggleButton imgTogBtnRed; 
+GImageToggleButton imgTogBtnGreen; 

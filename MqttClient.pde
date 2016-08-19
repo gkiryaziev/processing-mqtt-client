@@ -6,8 +6,11 @@ import java.util.UUID;
 
 MQTTClient client;
 
+int redLedState = 0;
+int greenLedState = 0;
+
 public void setup(){
-  size(340, 210, JAVA2D);
+  size(340, 260, JAVA2D);
   createGUI();
   customGUI();
   // Place your setup code here
@@ -35,6 +38,10 @@ public void setup(){
   client.subscribe("RPI1/SYSTEM/MEMORY/TOTAL", 0);
   client.subscribe("RPI1/SYSTEM/MEMORY/AVAILABLE", 0);
   client.subscribe("RPI1/SYSTEM/MEMORY/FREE", 0);
+  
+  // leds
+  client.subscribe("RPI1/SYSTEM/LED0/STATUS", 0);
+  client.subscribe("RPI1/SYSTEM/LED1/STATUS", 0);
 }
 
 public void draw(){
@@ -46,10 +53,10 @@ public void draw(){
 public void customGUI(){
 }
 
-//public void dispose(){
-//  println("dispose");
-//  super.dispose();
-//}
+public void dispose(){
+  println("dispose");
+  super.dispose();
+}
 
 void exit(){
   // unsubscribe
@@ -58,6 +65,11 @@ void exit(){
   client.unsubscribe("RPI1/SYSTEM/MEMORY/TOTAL");
   client.unsubscribe("RPI1/SYSTEM/MEMORY/AVAILABLE");
   client.unsubscribe("RPI1/SYSTEM/MEMORY/FREE");
+  
+  // leds
+  client.unsubscribe("RPI1/SYSTEM/LED0/STATUS");
+  client.unsubscribe("RPI1/SYSTEM/LED1/STATUS");
+  
   // disconnect
   client.disconnect();
   
@@ -95,6 +107,14 @@ void messageReceived(String topic, byte[] payload) {
       int data = int(new String(payload)) / 1024;
       lblMemoryFree.setText(str(data));
       lblMemoryFree.setTextBold();
+      break;
+    }
+    case "RPI1/SYSTEM/LED0/STATUS": {        // green ACT led
+      println("LED0: " + new String(payload));
+      break;
+    }
+    case "RPI1/SYSTEM/LED1/STATUS": {        // red POWER led
+      println("LED1: " + new String(payload));
       break;
     }
   }

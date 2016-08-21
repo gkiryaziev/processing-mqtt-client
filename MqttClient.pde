@@ -1,13 +1,12 @@
-// Need G4P library
+
 import g4p_controls.*;
-import mqtt.*;
 import java.awt.Font;
+import mqtt.*;
 import java.util.UUID;
 
 MQTTClient client;
-
-int redLedState = 0;
-int greenLedState = 0;
+CPU cpu;
+System system;
 
 public void setup(){
   size(340, 260, JAVA2D);
@@ -32,16 +31,20 @@ public void setup(){
   client = new MQTTClient(this);
   client.connect("tcp://test.mosquitto.org:1883", clientId);
   
+  // equipment
+  cpu = new CPU();
+  system = new System();
+  
   // subscribe
-  client.subscribe("RPI1/CPU/TEMP", 0);
-  client.subscribe("RPI1/CPU/CORE/VOLT", 0);
-  client.subscribe("RPI1/SYSTEM/MEMORY/TOTAL", 0);
-  client.subscribe("RPI1/SYSTEM/MEMORY/AVAILABLE", 0);
-  client.subscribe("RPI1/SYSTEM/MEMORY/FREE", 0);
+  cpu.temp().subscribe(0);
+  cpu.coreVolt().subscribe(0);
+  system.memoryTotal().subscribe(0);
+  system.memoryAvailable().subscribe(0);
+  system.memoryFree().subscribe(0);  
   
   // leds
-  client.subscribe("RPI1/SYSTEM/LED0/STATUS", 0);
-  client.subscribe("RPI1/SYSTEM/LED1/STATUS", 0);
+  system.led0().subscribe(0);
+  system.led1().subscribe(0);
 }
 
 public void draw(){
@@ -60,62 +63,19 @@ public void dispose(){
 
 void exit(){
   // unsubscribe
-  client.unsubscribe("RPI1/CPU/TEMP");
-  client.unsubscribe("RPI1/CPU/CORE/VOLT");
-  client.unsubscribe("RPI1/SYSTEM/MEMORY/TOTAL");
-  client.unsubscribe("RPI1/SYSTEM/MEMORY/AVAILABLE");
-  client.unsubscribe("RPI1/SYSTEM/MEMORY/FREE");
-  
+  cpu.temp().unsubscribe();
+  cpu.coreVolt().unsubscribe();
+  system.memoryTotal().unsubscribe();
+  system.memoryAvailable().unsubscribe();
+  system.memoryFree().unsubscribe();
+
   // leds
-  client.unsubscribe("RPI1/SYSTEM/LED0/STATUS");
-  client.unsubscribe("RPI1/SYSTEM/LED1/STATUS");
+  system.led0().unsubscribe();
+  system.led1().unsubscribe();
   
   // disconnect
   client.disconnect();
   
   println("exit");
   super.exit();
-}
-
-void messageReceived(String topic, byte[] payload) {
-
-  switch(topic) {
-    case "RPI1/CPU/TEMP": {
-      lblCpuTemp.setText(new String(payload));
-      lblCpuTemp.setTextBold();
-      break;
-    }
-    case "RPI1/CPU/CORE/VOLT": {
-      String data = nf(float(new String(payload)), 1, 2);
-      lblCpuCoreVolt.setText(data);
-      lblCpuCoreVolt.setTextBold();
-      break;
-    }
-    case "RPI1/SYSTEM/MEMORY/TOTAL": {
-      int data = int(new String(payload)) / 1024;
-      lblMemoryTotal.setText(str(data));
-      lblMemoryTotal.setTextBold();
-      break;
-    }
-    case "RPI1/SYSTEM/MEMORY/AVAILABLE": {
-      int data = int(new String(payload)) / 1024;
-      lblMemoryAvailable.setText(str(data));
-      lblMemoryAvailable.setTextBold();
-      break;
-    }
-    case "RPI1/SYSTEM/MEMORY/FREE": {
-      int data = int(new String(payload)) / 1024;
-      lblMemoryFree.setText(str(data));
-      lblMemoryFree.setTextBold();
-      break;
-    }
-    case "RPI1/SYSTEM/LED0/STATUS": {        // green ACT led
-      println("LED0: " + new String(payload));
-      break;
-    }
-    case "RPI1/SYSTEM/LED1/STATUS": {        // red POWER led
-      println("LED1: " + new String(payload));
-      break;
-    }
-  }
 }
